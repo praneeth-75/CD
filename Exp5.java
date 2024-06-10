@@ -147,3 +147,46 @@ return sb.toString();
 } 
 
 
+/* 
+
+Enter the non-terminals
+EATBF
+Enter the terminals
+i+*9
+Specify the grammar(Enter 9 for epsilon production)
+Enter the number of productions for E
+1
+Enter the productions
+TA
+Enter the number of productions for A
+2
+Enter the productions
++TA
+9
+Enter the number of productions for T
+1
+Enter the productions
+FB
+Enter the number of productions for B
+2
+Enter the productions
+*FB
+9
+Enter the number of productions for F
+2
+Enter the productions
+i
+(E)
+First Set
+i(
++9
+i(
+*9
+i(
+Follow Set
+$)
+$)
++$)
++$)
+*+$) 
+*/
