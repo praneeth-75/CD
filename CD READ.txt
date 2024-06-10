@@ -1,0 +1,1041 @@
+1 
+import java.util.*; 
+public class Exp1 
+{ 
+public static void main(String args[]) 
+{ 
+Scanner sc = new Scanner(System.in); 
+System.out.println("Enter the string : "); 
+String str=sc.next(); 
+int q=0,prev_q; 
+System.out.println("Initial state : "+q); 
+for(int i=0;i<str.length();i++) 
+{ 
+if(str.charAt(i)!='a' && str.charAt(i)!='b' && str.charAt(i)!='c'){ 
+System.out.println("Given String is invalid"); 
+return; 
+} 
+prev_q=q; 
+switch(q) 
+{ 
+case 0 : q=(str.charAt(i)=='a' )?1:0;break; 
+case 1 : q=(str.charAt(i)=='b')?2:(str.charAt(i)=='a')?1:0;break; 
+case 2 : q=(str.charAt(i)=='c')?3:(str.charAt(i)=='a')?1:0;break; 
+case 3 : q=(str.charAt(i)=='a')?1:0;break; } 
+System.out.println("Transition : q"+prev_q+" -> q"+q+"(Input : "+str.charAt(i)+")"); 
+} 
+if(q==3) 
+System.out.println("ACCEPTED"); 
+else 
+System.out.println("NOT ACCEPTED"); 
+} 
+} 
+
+OUTPUT:
+Enter the string : 
+aabc
+Initial state : 0
+Transition : q0 -> q1(Input : a)
+Transition : q1 -> q1(Input : a)
+Transition : q1 -> q2(Input : b)
+Transition : q2 -> q3(Input : c)
+ACCEPTED
+
+2.
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+public class Exp2 {
+public static boolean isValidIdentifier(String str) {
+ String regex = "[a-zA-Z_][a-zA-Z\\d_]*";
+ Pattern pattern = Pattern.compile(regex);
+ Matcher matcher = pattern.matcher(str);
+ return matcher.matches();
+ }
+ public static void main(String[] args) {
+ 
+ Scanner sc = new Scanner(System.in);
+ System.out.println("Enter program : ");
+ String s = sc.nextLine();
+ String arr[] = s.split(" ");
+ List<String> keywords = new 
+ArrayList<String>(Arrays.asList("if","else","int","float","string","double","boolean"));
+ List<String> operators = new ArrayList<String>(Arrays.asList(">","<",">=","<=","+","-","*","/","%","="));
+ List<String> delimiters = new 
+ArrayList<String>(Arrays.asList("{","}","[","]",",","(",")",";"));
+ 
+ for(int i=0;i<arr.length;i++) {
+ if(keywords.contains(arr[i])) {
+ System.out.println(arr[i]+" : Keyword");
+ }
+ else if(operators.contains(arr[i])) {
+ System.out.println(arr[i]+" : operator");
+ }
+ else if(delimiters.contains(arr[i])) {
+ System.out.println(arr[i]+" : delimiter");
+ }
+ else if(isValidIdentifier(arr[i])){
+ System.out.println(arr[i]+" : Identifier");
+ }
+ else {
+ System.out.println(arr[i]+" : literal");
+ }
+ }
+ sc.close();
+ 
+ }
+}
+
+/* 
+Enter program : 
+int a = c + b - 10 ;
+int : Keyword
+a : Identifier
+= : operator
+c : Identifier
++ : operator
+b : Identifier
+- : operator
+10 : literal
+; : delimiter
+*/
+
+3.
+import java.util.*;
+public class Exp3 {
+public static void main(String[] args) {
+Scanner sc = new Scanner(System.in);
+System.out.println("Enter no. of productions : ");
+int n = sc.nextInt();
+String str[] = new String[n];
+System.out.println("Enter productions : ");
+for(int i=0;i<n;i++) {
+str[i]=sc.next();
+}
+for(int i=0;i<n;i++) {
+String s = str[i];
+String first = s.substring(0,1);
+String second = s.substring(3);
+String arr[] = second.split("\\|");
+List<String> l1 = new ArrayList<String>();
+List<String> l2 = new ArrayList<String>();
+for(int j=0;j<arr.length;j++) {
+if(!first.equals(arr[j].substring(0,1))) {
+l1.add(arr[j]);
+}
+else {
+l2.add(arr[j]);
+}
+}
+if(!l2.isEmpty()) {
+System.out.print(first+"->");
+for(int k1=0;k1<l1.size();k1++) {
+System.out.print(l1.get(k1)+first+"'|");
+}
+System.out.print("\n"+first+"'->");
+for(int k1=0;k1<l2.size();k1++) {
+System.out.print(l2.get(k1).substring(1)+first+"'|");
+}
+System.out.print(" ϵ\n");
+}
+else {
+System.out.print(first+"->");
+for(int k1=0;k1<l1.size();k1++) {
+System.out.print(l1.get(k1)+"|");
+}
+System.out.println();
+}
+}
+sc.close();
+}
+}
+
+/* 
+ Enter no. of productions : 
+2
+Enter productions : 
+A->ABd|Aa|a
+B->Be|b
+A->aA'|
+A'->BdA'|aA'| ϵ
+*/
+
+4.import java.util.*;
+
+public class Exp4 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the number of productions:");
+        int n = sc.nextInt();
+        sc.nextLine();
+        String[] productions = new String[n];
+        System.out.println("Enter the productions:");
+        for (int i = 0; i < n; i++) {
+            productions[i] = sc.nextLine();
+        }
+        eliminateLeftFactoring(productions);
+    }
+
+    private static void eliminateLeftFactoring(String[] productions) {
+        boolean leftFactored = false;
+        for (String production : productions) {
+            String[] parts = production.split("->");
+            String lhs = parts[0].trim();
+            String[] rhs = parts[1].split("\\|");
+            String prefix = findCommonPrefix(rhs);
+            if (!prefix.isEmpty()) {
+                leftFactored = true;
+                System.out.println(lhs + "->" + prefix + lhs + "'");
+                List<String> newRhs = new ArrayList<>();
+                for (String r : rhs) {
+                    if (r.startsWith(prefix)) {
+                        String suffix = r.substring(prefix.length()).trim();
+                        if (suffix.isEmpty()) {
+                            suffix = "";
+                        }
+                        newRhs.add(suffix);
+                    } else {
+                        newRhs.add(r);
+                    }
+                }
+                System.out.println(lhs + "'->" + String.join("|", newRhs));
+            }
+        }
+        if (!leftFactored) {
+            System.out.println("Given productions do not have left factoring");
+        }
+    }
+
+    private static String findCommonPrefix(String[] rhs) {
+        String prefix = rhs[0];
+        for (int i = 1; i < rhs.length; i++) {
+            while (rhs[i].indexOf(prefix) != 0) {
+                prefix = prefix.substring(0, prefix.length() - 1);
+                if (prefix.isEmpty()) {
+                    return "";
+                }
+            }
+        }
+        return prefix;
+    }
+}
+
+5.
+import java.io.*;
+class Exp5
+{
+static char ntermnl[],termnl[];
+static int ntlen,tlen;
+static String grmr[][],fst[],flw[];
+public static void main(String args[]) throws IOException
+{
+String nt,t;
+int i,j,n;
+BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+System.out.println("Enter the non-terminals");
+nt=br.readLine();
+ntlen=nt.length();
+ntermnl=new char[ntlen];
+ntermnl=nt.toCharArray();
+System.out.println("Enter the terminals");
+t=br.readLine();
+tlen=t.length();
+termnl=new char[tlen];
+termnl=t.toCharArray();
+System.out.println("Specify the grammar(Enter 9 for epsilon production)");
+grmr=new String[ntlen][];
+for(i=0;i<ntlen;i++)
+{
+System.out.println("Enter the number of productions for "+ntermnl[i]);
+n=Integer.parseInt(br.readLine());
+grmr[i]=new String[n];
+System.out.println("Enter the productions");
+for(j=0;j<n;j++)
+grmr[i][j]=br.readLine();
+}
+fst=new String[ntlen];
+for(i=0;i<ntlen;i++)
+fst[i]=first(i);
+System.out.println("First Set");
+for(i=0;i<ntlen;i++)
+System.out.println(removeDuplicates(fst[i]));
+flw=new String[ntlen];
+for(i=0;i<ntlen;i++)
+flw[i]=follow(i);
+System.out.println("Follow Set");
+for(i=0;i<ntlen;i++)
+System.out.println(removeDuplicates(flw[i]));
+}
+static String first(int i)
+{
+int j,k,l=0,found=0;
+String temp="",str="";
+for(j=0;j<grmr[i].length;j++)
+{
+for(k=0;k<grmr[i][j].length();k++,found=0)
+{
+for(l=0;l<ntlen;l++)
+{
+if(grmr[i][j].charAt(k)==ntermnl[l])
+{
+str=first(l);
+if(!(str.length()==1 && str.charAt(0)=='9'))
+temp=temp+str;
+found=1;
+break;
+}
+}
+if(found==1)
+{
+if(str.contains("9"))
+continue;
+}
+else
+temp=temp+grmr[i][j].charAt(k);
+break;
+}
+}
+return temp;
+}
+static String follow(int i)
+{
+char pro[],chr[];
+String temp="";
+int j,k,l,m,n,found=0;
+if(i==0)
+temp="$";
+for(j=0;j<ntlen;j++)
+{
+for(k=0;k<grmr[j].length;k++)
+{
+pro=new char[grmr[j][k].length()];
+pro=grmr[j][k].toCharArray();
+for(l=0;l<pro.length;l++)
+{
+if(pro[l]==ntermnl[i])
+{
+if(l==pro.length-1)
+{
+if(j<i)
+temp=temp+flw[j];
+}
+else
+{
+for(m=0;m<ntlen;m++)
+{
+if(pro[l+1]==ntermnl[m])
+{
+chr=new char[fst[m].length()];
+chr=fst[m].toCharArray();
+for(n=0;n<chr.length;n++)
+{
+if(chr[n]=='9')
+{
+if(l+1==pro.length-1)
+temp=temp+follow(j);
+else
+temp=temp+follow(m);
+}
+else
+temp=temp+chr[n];
+}
+found=1;
+}
+}
+if(found!=1)
+temp=temp+pro[l+1];
+}
+}
+}
+}
+}
+return temp;
+}
+static String removeDuplicates(String str)
+{
+int i;
+char ch;
+boolean seen[] = new boolean[256];
+StringBuilder sb = new StringBuilder(seen.length);
+for(i=0;i<str.length();i++)
+{
+ch=str.charAt(i);
+if (!seen[ch])
+{
+seen[ch] = true;
+sb.append(ch);
+}}
+return sb.toString();
+}
+} 
+
+
+/* 
+
+Enter the non-terminals
+EATBF
+Enter the terminals
+i+*9
+Specify the grammar(Enter 9 for epsilon production)
+Enter the number of productions for E
+1
+Enter the productions
+TA
+Enter the number of productions for A
+2
+Enter the productions
++TA
+9
+Enter the number of productions for T
+1
+Enter the productions
+FB
+Enter the number of productions for B
+2
+Enter the productions
+*FB
+9
+Enter the number of productions for F
+2
+Enter the productions
+i
+(E)
+First Set
+i(
++9
+i(
+*9
+i(
+Follow Set
+$)
+$)
++$)
++$)
+*+$) 
+*/
+
+6.import java.util.*;
+public class Exp6 {
+static String s = "", st = "";
+public static void main(String[] args) {
+String[][] tab = {
+{"ta", "@", "@", "ta", "@", "@"},
+{"@", "+ta", "@", "@", "!", "!"},
+{"fb", "@", "@", "fb", "@", "@"},
+{"@", "!", "*fb", "@", "!", "!"},
+{"i", "@", "@", "(e)", "@", "@"}
+};
+Scanner scanner = new Scanner(System.in);
+System.out.print("Enter the string:\n");
+s = scanner.nextLine();
+s += "$";
+st = "$e";
+int st_i = 1, s_i = 0;
+StringBuilder temp = new StringBuilder();
+System.out.println("\nStack\t\tInput");
+while (!st.endsWith("$") || !s.endsWith("$")) {
+int s1, s2;
+switch (st.charAt(st_i)) {
+case 'e':
+s1 = 0;
+break;
+case 'a':
+s1 = 1;
+break;
+case 't':
+s1 = 2;
+break;
+case 'b':
+s1 = 3;
+break;
+case 'f':
+s1 = 4;
+break;
+default:
+s1 = -1;
+}
+switch (s.charAt(s_i)) {
+case 'i':
+s2 = 0;
+break;
+case '+':
+s2 = 1;
+break;
+case '*':
+s2 = 2;
+break;
+case '(':
+s2 = 3;
+break;
+case ')':
+s2 = 4;
+break;
+case '$':
+s2 = 5;
+break;
+default:
+s2 = -1;
+}
+if (s1 == -1 || s2 == -1) {
+System.out.println("Failure");
+return;
+}
+if (tab[s1][s2].equals("@")) {
+System.out.println("Failure");
+return;
+}
+if (tab[s1][s2].startsWith("!")) {
+st = st.substring(0, st_i);
+st_i--;
+} else {
+temp.setLength(0);
+for (int k = tab[s1][s2].length() - 1; k >= 0; k--) {
+temp.append(tab[s1][s2].charAt(k));
+}
+st = st.substring(0, st_i) + temp.toString();
+st_i = st.length() - 1;
+}
+System.out.print(st + "\t\t");
+for (int n = s_i; n < s.length(); n++) {
+System.out.print(s.charAt(n));
+}
+System.out.println();
+if (st.charAt(st_i) == s.charAt(s_i) && s.charAt(s_i) != '$') {
+st = st.substring(0, st_i);
+s_i++;
+st_i--;
+}
+}
+System.out.println("Success");
+
+}
+}
+
+
+/* 
+Enter the string:
+i+i*i
+
+Stack           Input
+$at             i+i*i$
+$abf            i+i*i$
+$abi            i+i*i$
+$a              +i*i$
+$at+            +i*i$
+$abf            i*i$
+$abi            i*i$
+$abf*           *i$
+$abi            i$
+$a              $
+$               $
+Success
+*/
+
+7.
+import java.util.Scanner;
+
+public class Exp7 {
+    static int k = 0, z = 0, i = 0, j = 0, c = 0;
+    static char[] a = new char[16];
+    static char[] stk = new char[15];
+    static String act = "";
+    static String ac = "";
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("GRAMMAR is:");
+        System.out.println("E->E+E");
+        System.out.println("E->E*E");
+        System.out.println("E->(E)");
+        System.out.println("E->id");
+        System.out.println("Enter input string:");
+        String input = sc.nextLine();
+        a = input.toCharArray();
+        c = a.length;
+        act = "\tSHIFT->";
+        System.out.println("stack\t\tinput\t\t\taction");
+        for (k = 0, i = 0, j = 0; j < c; k++, i++, j++) {
+            if (a[j] == 'i' && a[j + 1] == 'd') {
+                stk[i] = a[j];
+                stk[i + 1] = a[j + 1];
+                stk[i + 2] = '\0';
+                a[j] = ' ';
+                a[j + 1] = ' ';
+                System.out.println("$" + new String(stk) + "\t\t" + new String(a) + "$\t\t\t" + "id");
+                check();
+            } else {
+                stk[i] = a[j];
+                stk[i + 1] = '\0';
+                a[j] = ' ';
+                System.out.println("$" + new String(stk) + "\t\t" + new String(a) + "$\t\t\tsymbols");
+                check();
+            }
+        }
+    }
+
+    static void check() {
+        ac = "\t\tREDUCE TO E";
+        for (z = 0; z < c; z++) {
+            if (stk[z] == 'i' && stk[z + 1] == 'd') {
+                stk[z] = 'E';
+                stk[z + 1] = '\0';
+                break;
+            }
+        }
+        for (z = 0; z < c; z++) {
+            if (stk[z] == 'E' && stk[z + 1] == '+' && stk[z + 2] == 'E') {
+                stk[z] = 'E';
+                stk[z + 1] = '\0';
+                stk[z + 2] = '\0';
+                i = i - 2;
+            }
+        }
+        for (z = 0; z < c; z++) {
+            if (stk[z] == 'E' && stk[z + 1] == '*' && stk[z + 2] == 'E') {
+                stk[z] = 'E';
+                stk[z + 1] = '\0';
+                stk[z + 2] = '\0';
+                i = i - 2;
+            }
+        }
+        for (z = 0; z < c; z++) {
+            if (stk[z] == '(' && stk[z + 1] == 'E' && stk[z + 2] == ')') {
+                stk[z] = 'E';
+                stk[z + 1] = '\0';
+                stk[z + 2] = '\0';
+                i = i - 2;
+            }
+        }
+        System.out.println("$" + new String(stk) + "\t\t" + new String(a) + "$\t\t" + ac);
+        j++;
+    }
+}
+
+
+/*GRAMMAR is:
+E->E+E
+E->E*E
+E->(E)
+E->id
+Enter input string:
+id+id*id
+stack           input                   action
+$id               +id*id$                       id
+$E                +id*id$                               REDUCE TO E
+$E+                id*id$                       symbols
+$E+                id*id$                               REDUCE TO E
+$E+d               i *id$                       symbols
+$E+d               i *id$                               REDUCE TO E
+$E+did             i *  $                       id
+$E+dE              i *  $                               REDUCE TO E
+
+
+ */
+
+8.
+import java.util.Scanner;
+import java.util.*;
+
+public class Exp8
+{
+   
+    public static void main(String[] args)
+	{
+		String stack="$";
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the string");
+        String input = scanner.next();
+        input += "$";
+        int len = input.length()-1;
+        boolean f=false;
+        
+        List<String> list=Arrays.asList("i","E+E","E*E","(E)");
+
+
+        System.out.println("\nSTACK\tINPUT\tACTION");
+
+		//stack=stack+input.charAt(0)+"";
+
+        for(int i=0;i<len||stack.length()>2;i++)
+		{
+			if(i<len)
+			{
+				stack=stack+input.charAt(i);
+				System.out.print(stack+"\t");
+				System.out.print(input.substring(i+1)+"\t");
+				System.out.print("SHIFT");
+				
+			}
+            String temp="";
+            for(String t:list)
+			{
+				if(stack.contains(t))
+				{
+                    temp=t;
+					f=true;
+					break;
+				}
+			}
+			if(f)
+			{
+				System.out.println();
+
+			
+				stack=stack.replace(temp,"E");
+				System.out.print(stack+"\t");
+
+				if(i<len)
+			    System.out.print(input.substring(i+1)+"\t");
+				else
+				System.out.print("$"+"\t");
+				System.out.print("Reduces "+temp+"->E");
+
+				f=false;
+			}
+			
+			System.out.println();
+		}
+        
+		
+
+	}
+     
+}
+
+/*
+Enter the string
+i+i*i
+
+STACK   INPUT   ACTION
+$i      +i*i$   SHIFT
+$E      +i*i$   Reduces i->E
+$E+     i*i$    SHIFT
+$E+i    *i$     SHIFT
+$E+E    *i$     Reduces i->E
+$E+E*   i$      SHIFT
+$E*     i$      Reduces E+E->E
+$E*i    $       SHIFT
+$E*E    $       Reduces i->E
+
+$E      $       Reduces E*E->E
+*/
+
+9.
+import java.util.*;
+
+import java.util.Scanner;
+
+public class Exp9 {
+    static final int size = 5;
+    static int[] s = new int[size];
+    static int top = -1;
+
+    public static boolean isFull() {
+        return top >= size - 1;
+    }
+
+    public static void push(int item) {
+        top++;
+        s[top] = item;
+    }
+
+    public static boolean isEmpty() {
+        return top == -1;
+    }
+
+    public static int pop() {
+        int item = s[top];
+        top--;
+        return item;
+    }
+
+    public static void display() {
+        if (isEmpty()) {
+            System.out.println("Stack Is Empty!");
+        } else {
+            for (int i = top; i >= 0; i--) {
+                System.out.println(s[i]);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int item, choice;
+        char ans;
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n\tImplementation Of Stack");
+        do {
+            System.out.println("\nMain Menu");
+            System.out.println("1. Push");
+            System.out.println("2. Pop");
+            System.out.println("3. Display");
+            System.out.println("4. Exit");
+            System.out.print("Enter Your Choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("\nEnter The item to be pushed: ");
+                    item = scanner.nextInt();
+                    if (isFull()) {
+                        System.out.println("\nStack is Full!");
+                    } else {
+                        push(item);
+                    }
+                    break;
+                case 2:
+                    if (isEmpty()) {
+                        System.out.println("\nEmpty stack! Underflow !!");
+                    } else {
+                        item = pop();
+                        System.out.println("\nThe popped element is " + item);
+                    }
+                    break;
+                case 3:
+                    display();
+                    break;
+                case 4:
+                    System.exit(0);
+            }
+            System.out.print("\nDo You want To Continue? (Y/N): ");
+            ans = scanner.next().charAt(0);
+        } while (ans == 'Y' || ans == 'y');
+    }
+}
+
+
+import java.util.*;
+
+import java.util.Scanner;
+
+public class Exp9 {
+    static final int size = 5;
+    static int[] s = new int[size];
+    static int top = -1;
+
+    public static boolean isFull() {
+        return top >= size - 1;
+    }
+
+    public static void push(int item) {
+        top++;
+        s[top] = item;
+    }
+
+    public static boolean isEmpty() {
+        return top == -1;
+    }
+
+    public static int pop() {
+        int item = s[top];
+        top--;
+        return item;
+    }
+
+    public static void display() {
+        if (isEmpty()) {
+            System.out.println("Stack Is Empty!");
+        } else {
+            for (int i = top; i >= 0; i--) {
+                System.out.println(s[i]);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int item, choice;
+        char ans;
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n\tImplementation Of Stack");
+        do {
+            System.out.println("\nMain Menu");
+            System.out.println("1. Push");
+            System.out.println("2. Pop");
+            System.out.println("3. Display");
+            System.out.println("4. Exit");
+            System.out.print("Enter Your Choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("\nEnter The item to be pushed: ");
+                    item = scanner.nextInt();
+                    if (isFull()) {
+                        System.out.println("\nStack is Full!");
+                    } else {
+                        push(item);
+                    }
+                    break;
+                case 2:
+                    if (isEmpty()) {
+                        System.out.println("\nEmpty stack! Underflow !!");
+                    } else {
+                        item = pop();
+                        System.out.println("\nThe popped element is " + item);
+                    }
+                    break;
+                case 3:
+                    display();
+                    break;
+                case 4:
+                    System.exit(0);
+            }
+            System.out.print("\nDo You want To Continue? (Y/N): ");
+            ans = scanner.next().charAt(0);
+        } while (ans == 'Y' || ans == 'y');
+    }
+}
+
+/*
+ 
+        Implementation Of Stack
+
+Main Menu
+1. Push
+2. Pop
+3. Display
+4. Exit
+Enter Your Choice: 1
+
+Enter The item to be pushed: 1
+
+Do You want To Continue? (Y/N): y
+
+Main Menu
+1. Push
+2. Pop
+3. Display
+4. Exit
+Enter Your Choice: 2
+
+The popped element is 1
+
+Do You want To Continue? (Y/N): 4
+ */
+
+10.
+import java.util.ArrayList;
+
+public class Exp10 {
+    private static int i = 1, j = 0, no = 0, tmpch = 90;
+    private static String str = "";
+    private static String left = "", right = "";
+    private static ArrayList<Exp> k = new ArrayList<>();
+
+    private static class Exp {
+        int pos;
+        char op;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("\t\tIntermediate code generation");
+        System.out.print("Enter the expression: ");
+        str = System.console().readLine();
+        System.out.println("The Intermediate code:\t\t Expression");
+        findopr();
+        explore();
+    }
+
+    private static void findopr() {
+        for (i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == ':') {
+                Exp e = new Exp();
+                e.pos = i;
+                e.op = ':';
+                k.add(e);
+                j++;
+            } else if (str.charAt(i) == '/') {
+                Exp e = new Exp();
+                e.pos = i;
+                e.op = '/';
+                k.add(e);
+                j++;
+            } else if (str.charAt(i) == '*') {
+                Exp e = new Exp();
+                e.pos = i;
+                e.op = '*';
+                k.add(e);
+                j++;
+            } else if (str.charAt(i) == '+') {
+                Exp e = new Exp();
+                e.pos = i;
+                e.op = '+';
+                k.add(e);
+                j++;
+            } else if (str.charAt(i) == '-') {
+                Exp e = new Exp();
+                e.pos = i;
+                e.op = '-';
+                k.add(e);
+                j++;
+            }
+        }
+    }
+
+    private static void explore() {
+        i = 1;
+        while (i < k.size() && k.get(i).op != '\0') {
+            fleft(k.get(i).pos);
+            fright(k.get(i).pos);
+            str = str.substring(0, k.get(i).pos) + (char) tmpch-- + str.substring(k.get(i).pos + 1);
+            System.out.printf("\t %c:=%s%c%s\t\t", str.charAt(k.get(i).pos), left, k.get(i).op, right);
+            for (int x = 0; x < str.length(); x++) {
+                if (str.charAt(x) != '$') {
+                    System.out.print(str.charAt(x));
+                }
+            }
+            System.out.println();
+            i++;
+        }
+        fright(-1);
+        if (no == 0) {
+            fleft(str.length());
+            System.out.printf("\t %s:=%s", right, left);
+        }
+        System.out.printf("\t %s:=%c", right, str.charAt(k.get(--i).pos));
+    }
+
+    private static void fleft(int x) {
+        int w = 0;
+        boolean flag = false;
+        x--;
+        while (x != -1 && str.charAt(x) != '+' && str.charAt(x) != '*' && str.charAt(x) != '=' && str.charAt(x) != '\0' && str.charAt(x) != '-' && str.charAt(x) != '/' && str.charAt(x) != ':') {
+            if (str.charAt(x) != '$' && !flag) {
+                left = str.charAt(x) + left;
+                str = str.substring(0, x) + "$" + str.substring(x + 1);
+                flag = true;
+            }
+            x--;
+
+        }
+    }
+
+    private static void fright(int x) {
+        int w = 0;
+        boolean flag = false;
+        x++;
+        while (x != -1 && x < str.length() && str.charAt(x) != '+' && str.charAt(x) != '*' && str.charAt(x) != '=' && str.charAt(x) != '\0' && str.charAt(x) != '-' && str.charAt(x) != '/' && str.charAt(x) != ':') {
+            if (str.charAt(x) != '$' && !flag) {
+                right += str.charAt(x);
+                str = str.substring(0, x) + "$" + str.substring(x + 1);
+                flag = true;
+            }
+            x++;
+        }
+    }
+}
+
+/*
+                 Intermediate code generation
+Enter the expression: a*b+c/d-e/f+g*
+The Intermediate code:           Expression
+         Z:=b+c         a*Z/d-e/f+g*
+         Y:=Zb/cd               a*Y-e/f+g*
+         X:=YZb-cde             a*X/f+g*
+         W:=XYZb/cdef           a*W+g*
+         V:=WXYZb+cdefg         a*V*
+         U:=VWXYZb*cdefg                a*U
+         cdefga:=UVWXYZb         cdefga:=$
+ */
